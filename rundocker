@@ -1,0 +1,19 @@
+. ~/.rc
+myapp=nginx-openshift
+myorg=wavecloud
+myimage=$myorg/$myapp
+myport=8081
+
+echo "build and push docker images"
+docker login -uzhanghongqi -p${dockerps}
+set -x
+
+docker build -f Dockerfile -t wavecloud/nginx-openshift  . 
+
+# docker push $myimage
+# docker rmi $myimage
+
+echo "stop and start docker"
+docker rm -f mynginx
+docker run --name mynginx -p 8081:8081 -d wavecloud/nginx-openshift
+

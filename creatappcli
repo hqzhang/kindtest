@@ -1,0 +1,28 @@
+#!/bin/bash
+ set -x
+# MASTER=hongqi@192.168.99.110
+# scp ${MASTER}:~/.kube/config .
+# export KUBECONFIG=$(pwd)/config
+
+ image=wavecloud/nginx-std
+ port=8081
+ app=nginx
+ docker build -f Dockerfile -t $image  .
+
+ echo "push and remove docker images"
+ docker login -uzhanghongqi -pa568Pqt123
+ docker push $image
+
+ kubectl get pods
+
+ kubectl delete deploy $app
+ kubectl delete pod $app
+ kubectl delete svc $app
+
+ kubectl create deployment $app --image=$image --port=$port
+
+ kubectl expose deployment $app --target-port=$port --type=NodePort
+
+ kc port-forward svc/nginx  8888:$port &
+
+ curl localhost:888
