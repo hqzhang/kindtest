@@ -39,6 +39,7 @@ pipeline {
                             docker login -u$USERNAME -p$PASSWORD
 
                             echo "build docker"
+                            ls -al
                             docker build -f Dockerfile -t $image . 
                          
                             echo "push docker"
