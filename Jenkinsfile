@@ -38,6 +38,8 @@ pipeline {
                             echo "login docker"
                             docker login -u$USERNAME -p$PASSWORD
 
+
+
                             echo "build docker"
                             ls -al
                             docker build -f Dockerfile -t $image . 
@@ -45,16 +47,19 @@ pipeline {
                             echo "push docker"
                             docker push $image
 
+                            echo "clean local one"
+                            docker rmi $image
+
                             echo "deploy docker remotely"
-                            #ssh root@192.168.2.38docker login -u$USERNAME -p$PASSWORD
-                            ssh root@192.168.2.38 docker run --name $app -d -p $port:$port $image
+                           
+                            docker run --name $app -d -p $port:$port $image
 
                             echo "verify docker"
-                            if curl 192.168.2.38:$port | grep 'Welcome to nginx!' ; then
+                            if curl localhost:$port | grep 'Welcome to nginx!' ; then
                                 echo "verify successfully"
                             else
                                 echo "ERROR: verify failure"
-                                exit
+                                exit 1;
                             fi
 
 
