@@ -43,7 +43,7 @@ pipeline {
                             docker build -f Dockerfile -t $image . 
                          
                             echo "push docker"
-                            docker push $image  .
+                            docker push $image
 
                             echo "deploy docker remotely"
                             #ssh root@192.168.2.38docker login -u$USERNAME -p$PASSWORD
