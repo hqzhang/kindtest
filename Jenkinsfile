@@ -16,7 +16,7 @@ pipeline {
        PATH="/usr/local/bin:$PATH"
        myvar='helloworld'
        private_key='afb3704a-da55-4576-9fb9-9a6265319f2b'
-       dockerCred='	48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
+       dockerCred='48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
        app='nginx-openshift'
        org='wavecloud'
        image="$myorg/$myapp"
