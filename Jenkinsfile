@@ -54,6 +54,9 @@ pipeline {
                            
                             docker run --name $app -d -p $port:$port $image
 
+                            echo "wait a whole"
+                            sleep 10
+
                             echo "verify docker"
                             if curl localhost:$port | grep 'Welcome to nginx!' ; then
                                 echo "verify successfully"
