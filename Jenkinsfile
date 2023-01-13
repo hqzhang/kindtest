@@ -45,7 +45,8 @@ pipeline {
                             ssh root@192.168.2.38 docker run --name $app -d -p $port:$port $image
 
                             echo "verify docker"
-                            ssh root@192.168.2.38 docker ps
+                            
+                            curl 192.168.2.38:$port
                             """
                            }
 						}

@@ -41,11 +41,20 @@ pipeline {
                             echo "push docker"
                             ssh root@192.168.2.38 docker push $image  .
 
-                            echo "run docker"
-                            ssh root@192.168.2.38 docker run --name $app -d -p $port:$port $image
+                            echo "create dep "
+                            kubectl create deployment $app --image=$image --port=$port
+                            
+                            echo "create svc"
+                            kubectl expose deployment $app --target-port=$port --type=NodePort
+
+                            echo "port forward "
+                            kubectl port-forward service/nginx 8888:$port &
 
                             echo "verify docker"
-                            ssh root@192.168.2.38 docker ps
+                            ssh root@192.168.2.38 curl localhost:8888
+                            
+                            echo "clean port-forward"
+                            #??
                             """
                            }
 						}

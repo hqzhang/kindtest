@@ -10,7 +10,7 @@
  docker build -f Dockerfile -t $image  .
 
  echo "push and remove docker images"
- docker login -uzhanghongqi -pa568Pqt123
+ docker login -uzhanghongqi -ppass
  docker push $image
 
  kubectl get pods
