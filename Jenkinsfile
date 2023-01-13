@@ -41,6 +41,7 @@ pipeline {
 
 
                             echo "build docker"
+                            docker rm -f $app
                             ls -al
                             docker build -f Dockerfile -t $image . 
                          
