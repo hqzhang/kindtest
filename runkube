@@ -1,0 +1,16 @@
+. ~/.rc
+docker login -uzhanghongqi -p${dockerps}
+
+#docker run --name mynginx -p 8081:8081 -d wavecloud/nginx-openshift
+kubectl create deployment nginx --image=wavecloud/nginx-openshift
+
+
+#kubectl create service nodeport nginx --tcp=80:80
+kubectl expose deployment nginx --target-port=8081 --type=NodePort
+kubectl get svc
+#nginx          NodePort    10.110.83.26     <none>        80:30938/TCP   5m
+ 
+#curl podNodeIP:30938
+
+
+
