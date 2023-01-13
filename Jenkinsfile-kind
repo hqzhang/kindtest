@@ -16,11 +16,11 @@ pipeline {
        PATH="/usr/local/bin:$PATH"
        myvar='helloworld'
        private_key='afb3704a-da55-4576-9fb9-9a6265319f2b'
-       dockerCred='48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
-       app='nginx-openshift'
-       org='wavecloud'
-       image="${org}/${app}"
-       port='8081'
+       dockerCred='	48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
+       app=nginx-openshift
+       org=wavecloud
+       image=$myorg/$myapp
+       port=8081
 
     }
 
@@ -30,7 +30,7 @@ pipeline {
                 script {
                     echo "Stage: Initial and Clean..."
                     echo "Input Parameters: ${params}"
-                    withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'dockerCred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh """
                             echo "check docker"
                             docker ps
@@ -39,25 +39,40 @@ pipeline {
                             docker login -u$USERNAME -p$PASSWORD
 
                             echo "build docker"
-                            ls -al
                             docker build -f Dockerfile -t $image . 
                          
                             echo "push docker"
                             docker push $image  .
 
-                            echo "deploy docker remotely"
-                            #ssh root@192.168.2.38docker login -u$USERNAME -p$PASSWORD
-                            ssh root@192.168.2.38 docker run --name $app -d -p $port:$port $image
+                            echo "set kube environment"
+                            MASTER=root@192.168.2.38
+                            scp root@192.168.2.38:~/.kube/config .
+                            export KUBECONFIG=$(pwd)/config
+
+                            echo "deploy on kubernetes remotely"
+                            echo "create dep "
+                            kubectl create deployment $app --image=$image --port=$port
+                            
+                            echo "create svc"
+                            kubectl expose deployment $app --target-port=$port --type=NodePort
+
+                            echo "port forward "
+                            kubectl port-forward service/nginx 8888:$port --address='0.0.0.0' &
 
                             echo "verify docker"
-                            if curl 192.168.2.38:$port | grep 'Welcome to nginx!' ; then
+                            curl 192.168.2.38:8888
+
+                            echo "verify docker"
+                            curl 192.168.2.38:$port | grep 'Welcome to nginx!' &> /dev/null
+                            if [ $? == 0 ]; then
                                 echo "verify successfully"
                             else
                                 echo "ERROR: verify failure"
                                 exit
                             fi
-
-
+                            
+                            echo "clean background portforward"
+                            #??
                             """
                            }
 						}
