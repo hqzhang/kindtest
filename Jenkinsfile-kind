@@ -29,7 +29,7 @@ pipeline {
                 script {
                     echo "Stage: Initial and Clean..."
                     echo "Input Parameters: ${params}"
-                    withCredentials([usernamePassword(credentialsId: 'dockerCred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh """
                             echo "check docker"
                             ssh -t root@192.168.2.38 "
