@@ -17,10 +17,10 @@ pipeline {
        myvar='helloworld'
        private_key='afb3704a-da55-4576-9fb9-9a6265319f2b'
        dockerCred='	48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
-       app=nginx-openshift
-       org=wavecloud
-       image=$myorg/$myapp
-       port=8081
+       app='nginx-openshift'
+       org='wavecloud'
+       image="$myorg/$myapp"
+       port='8081'
 
     }
 
@@ -32,21 +32,32 @@ pipeline {
                     echo "Input Parameters: ${params}"
                     withCredentials([usernamePassword(credentialsId: 'dockerCred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh """
-                            echo "scp dockerfile"
-                            scp Dockerfile root@192.168.2.38:~/workspace
+                            echo "check docker"
+                            docker ps
+
+                            echo "login docker"
+                            docker login -u$USERNAME -p$PASSWORD
 
                             echo "build docker"
-                            ssh root@192.168.2.38 docker login -u$USERNAME -p$PASSWORD
-
+                            docker build -f Dockerfile -t $image . 
+                         
                             echo "push docker"
-                            ssh root@192.168.2.38 docker push $image  .
+                            docker push $image  .
 
-                            echo "run docker"
+                            echo "deploy docker remotely"
+                            #ssh root@192.168.2.38docker login -u$USERNAME -p$PASSWORD
                             ssh root@192.168.2.38 docker run --name $app -d -p $port:$port $image
 
                             echo "verify docker"
-                            
-                            curl 192.168.2.38:$port
+                            curl 192.168.2.38:$port | grep 'Welcome to nginx!' &> /dev/null
+                            if [ $? == 0 ]; then
+                                echo "verify successfully"
+                            else
+                                echo "ERROR: verify failure"
+                                exit
+                            fi
+
+
                             """
                            }
 						}

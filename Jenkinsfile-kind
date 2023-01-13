@@ -32,15 +32,24 @@ pipeline {
                     echo "Input Parameters: ${params}"
                     withCredentials([usernamePassword(credentialsId: 'dockerCred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh """
-                            echo "scp dockerfile"
-                            scp Dockerfile root@192.168.2.38:~/workspace
+                            echo "check docker"
+                            docker ps
+
+                            echo "login docker"
+                            docker login -u$USERNAME -p$PASSWORD
 
                             echo "build docker"
-                            ssh root@192.168.2.38 docker login -u$USERNAME -p$PASSWORD
-
+                            docker build -f Dockerfile -t $image . 
+                         
                             echo "push docker"
-                            ssh root@192.168.2.38 docker push $image  .
+                            docker push $image  .
 
+                            echo "set kube environment"
+                            MASTER=root@192.168.2.38
+                            scp root@192.168.2.38:~/.kube/config .
+                            export KUBECONFIG=$(pwd)/config
+
+                            echo "deploy on kubernetes remotely"
                             echo "create dep "
                             kubectl create deployment $app --image=$image --port=$port
                             
@@ -48,12 +57,21 @@ pipeline {
                             kubectl expose deployment $app --target-port=$port --type=NodePort
 
                             echo "port forward "
-                            kubectl port-forward service/nginx 8888:$port &
+                            kubectl port-forward service/nginx 8888:$port --address='0.0.0.0' &
 
                             echo "verify docker"
-                            ssh root@192.168.2.38 curl localhost:8888
+                            curl 192.168.2.38:8888
+
+                            echo "verify docker"
+                            curl 192.168.2.38:$port | grep 'Welcome to nginx!' &> /dev/null
+                            if [ $? == 0 ]; then
+                                echo "verify successfully"
+                            else
+                                echo "ERROR: verify failure"
+                                exit
+                            fi
                             
-                            echo "clean port-forward"
+                            echo "clean background portforward"
                             #??
                             """
                            }
