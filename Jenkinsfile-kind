@@ -32,7 +32,8 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh """
                             echo "check docker"
-                            ssh -t root@192.168.2.38 "
+                            ssh -t root@192.168.2.38 " cd ~/workspace/kindtest
+                            
                                         docker ps
 
                                         echo login docker
