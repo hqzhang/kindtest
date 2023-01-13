@@ -19,7 +19,7 @@ pipeline {
        dockerCred='48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
        app='nginx-openshift'
        org='wavecloud'
-       image="$myorg/$myapp"
+       image="${org}/${app}"
        port='8081'
 
     }
