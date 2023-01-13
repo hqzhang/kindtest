@@ -59,7 +59,7 @@ pipeline {
                             sleep 10
 
                             echo "verify docker"
-                            if curl localhost:$port | grep 'Welcome to nginx!' ; then
+                            if curl localhost:$port | grep 'Welcome HONGQI' ; then
                                 echo "verify successfully"
                             else
                                 echo "ERROR: verify failure"
