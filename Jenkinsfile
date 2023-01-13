@@ -38,8 +38,6 @@ pipeline {
                             echo "login docker"
                             docker login -u$USERNAME -p$PASSWORD
 
-
-
                             echo "build docker"
                             docker rm -f $app
                             ls -al

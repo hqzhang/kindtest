@@ -33,21 +33,28 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerCred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh """
                             echo "check docker"
-                            docker ps
+                            ssh -t root@192.168.2.38 "
+                                        docker ps
 
-                            echo "login docker"
-                            docker login -u$USERNAME -p$PASSWORD
+                                        echo login docker
+                                        docker login -u$USERNAME -p$PASSWORD
 
-                            echo "build docker"
-                            docker build -f Dockerfile -t $image . 
-                         
-                            echo "push docker"
-                            docker push $image  .
+                                        echo build docker
+                                        docker rm -f $app
+                                        ls -al
+                                        docker build -f Dockerfile -t $image . 
+                                    
+                                        echo push docker
+                                        docker push $image
 
+                                        echo clean local one
+                                        docker rmi $image"
+                            """
+                            /*
                             echo "set kube environment"
-                            MASTER=root@192.168.2.38
-                            scp root@192.168.2.38:~/.kube/config .
-                            export KUBECONFIG=$(pwd)/config
+                            #MASTER=root@192.168.2.38
+                            #scp root@192.168.2.38:~/.kube/config .
+                            #export KUBECONFIG=$(pwd)/config
 
                             echo "deploy on kubernetes remotely"
                             echo "create dep "
@@ -62,18 +69,18 @@ pipeline {
                             echo "verify docker"
                             curl 192.168.2.38:8888
 
+                            echo "wait a whole"
+                            sleep 10
+
                             echo "verify docker"
-                            curl 192.168.2.38:$port | grep 'Welcome to nginx!' &> /dev/null
-                            if [ $? == 0 ]; then
+                            if curl localhost:$port | grep 'Welcome HONGQI' ; then
                                 echo "verify successfully"
                             else
                                 echo "ERROR: verify failure"
-                                exit
+                                exit 1;
                             fi
-                            
-                            echo "clean background portforward"
-                            #??
-                            """
+
+                            */
                            }
 						}
 					}
