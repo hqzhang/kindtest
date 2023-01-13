@@ -49,10 +49,7 @@ pipeline {
                             ssh root@192.168.2.38 docker run --name $app -d -p $port:$port $image
 
                             echo "verify docker"
-                            curl 192.168.2.38:$port | grep 'Welcome to nginx!' &> /dev/null
-                            state=$?
-                            
-                            if [[ "${state}" == 0 ]]; then
+                            if curl 192.168.2.38:$port | grep 'Welcome to nginx!' ; then
                                 echo "verify successfully"
                             else
                                 echo "ERROR: verify failure"
