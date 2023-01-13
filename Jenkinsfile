@@ -50,7 +50,8 @@ pipeline {
 
                             echo "verify docker"
                             curl 192.168.2.38:$port | grep 'Welcome to nginx!' &> /dev/null
-                            if [[ "$?" == 0 ]]; then
+                            state=$?
+                            if [[ "${state}" == 0 ]]; then
                                 echo "verify successfully"
                             else
                                 echo "ERROR: verify failure"
