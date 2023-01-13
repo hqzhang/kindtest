@@ -33,7 +33,7 @@ pipeline {
                         sh """
                             echo "check docker"
                             ssh -t root@192.168.2.38 " cd ~/workspace/kindtest
-                            
+
                                         docker ps
 
                                         echo login docker
@@ -49,6 +49,23 @@ pipeline {
 
                                         echo clean local one
                                         docker rmi $image"
+
+                            """
+                             sh """
+                            echo "check docker"
+                            ssh -t root@192.168.2.38 "
+                                kubectl get nodes
+
+                                echo clean old one
+                                kubectl delete svc $app
+                                kubectl delete deploy $app
+
+                                echo create dep 
+                                kubectl create deployment $app --image=$image --port=$port
+
+                                echo create svc
+                                kubectl expose deployment $app --target-port=$port --type=NodePort"
+
                             """
                             /*
                             echo "set kube environment"
