@@ -20,7 +20,8 @@ pipeline {
        dockerCred='	48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
        image='wavecloud/nginx-std'
        port='8081'
-        app='nginx'
+       app='nginx'
+       KUBECONFIG=./config
     }
 
     stages {
@@ -50,7 +51,6 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                      sh """
                       echo "clean environment"
-                        export KUBECONFIG=./config
                         kubectl delete svc $app || echo "delete no existing"
                         kubectl delete deploy $app || echo "delete no existing"
                        
