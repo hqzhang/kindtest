@@ -37,12 +37,6 @@ pipeline {
                         docker login -u$USERNAME -p$PASSWORD
                         docker push $image
                         docker rmi $image
-
-                        echo "clean environment"
-                        cat config
-                        export KUBECONFIG=./config
-                        kubectl delete svc $app
-                        kubectl delete deploy $app
                   
                         """
                     }
@@ -56,10 +50,9 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                      sh """
                       echo "clean environment"
-                        cat config
                         export KUBECONFIG=./config
-                        kubectl delete svc $app
-                        kubectl delete deploy $app
+                        kubectl delete svc $app || echo "delete no existing"
+                        kubectl delete deploy $app || echo "delete no existing"
                        
                         echo "deploy docker"
                         kubectl create deployment $app --image=$image --port=$port
