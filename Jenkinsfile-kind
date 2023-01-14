@@ -39,9 +39,8 @@ pipeline {
                         docker rmi $image
 
                         echo "clean environment"
-                        pwd
+                        cat config
                         export KUBECONFIG=./config
-                        ls -al config
                         kubectl delete svc $app
                         kubectl delete deploy $app
                        
