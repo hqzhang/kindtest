@@ -2,20 +2,19 @@
 properties([
    pipelineTriggers([githubPush()]),
    parameters([
-           choice(name: 'choice1', choices: ['dev','qa','prod'], description: 'input cluster'),
-           choice(name: 'ocversion', choices: ['oc-3.9.0','oc-3.10.0'], description: 'input oc version'),
-
-					 ])
-		])
+              string(name: 'Org', default: 'wavecloud', description: 'input organization'),
+              string(name: 'App', default: 'nginx-openshift', description: 'input application'),
+              string(name: 'image', default: 'wavecloud/nginx-std', description: 'input image'),
+              string(name: 'Port', default: '8081', description: 'input expose port'),
+	])
+])
 println("Start pipeline declarative")
 pipeline {
     agent any
-    
     options { timestamps () }
     environment { 
        //define global variable
        PATH="/usr/local/bin:$PATH"
-       myvar='helloworld'
        private_key='afb3704a-da55-4576-9fb9-9a6265319f2b'
        dockerCred='	48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
        image='wavecloud/nginx-std'
