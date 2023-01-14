@@ -34,7 +34,7 @@ pipeline {
 
                             echo "build docker"
                             docker rm -f $app | echo "container not running"
-                            docker build -f Dockerfile -t $image . 
+                            docker build -f Dockerfile -t $image  . 
                          
                             echo "push docker and clean"
                             docker push $image

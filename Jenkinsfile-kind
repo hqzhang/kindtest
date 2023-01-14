@@ -47,7 +47,8 @@ pipeline {
             steps { 
                 script {
                     echo "Stage: Deploy on kubernetes.."
-                    withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: dockerCred, \
+                                     usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                      sh """
                       echo "clean environment"
                         kubectl delete svc $app || echo "delete no existing"
