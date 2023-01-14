@@ -39,6 +39,8 @@ pipeline {
                         docker rmi $image
 
                         echo "clean environment"
+                        pwd
+                        ls -al ~/.kube/config
                         #kubectl delete svc $app
                         #kubectl delete deploy $app
                         kubectl get nodes
