@@ -17,10 +17,9 @@ pipeline {
        myvar='helloworld'
        private_key='afb3704a-da55-4576-9fb9-9a6265319f2b'
        dockerCred='	48bc6aae-d8cc-43ce-8eac-6d9bd209a8be'
-       app='nginx-openshift'
-       org='wavecloud'
-       image="${org}/${app}"
+       image='wavecloud/nginx-std'
        port='8081'
+        app='nginx'
     }
 
     stages {
@@ -30,74 +29,39 @@ pipeline {
                     echo "Stage: Initial and Clean..."
                     echo "Input Parameters: ${params}"
                     withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh """
-                            echo "check docker"
-                            ssh -t root@192.168.2.38 " cd ~/workspace/kindtest
+                     sh """
+                        echo "build and push docker images"
+                        docker build -f Dockerfile -t $image  .
 
-                                        docker ps
+                        docker login -u$USERNAME -p$PASSWORD
+                        docker push $image
+                        docker rmi $image
 
-                                        echo login docker
-                                        docker login -u$USERNAME -p$PASSWORD
+                        echo "clean environment"
+                        kubectl delete deploy $app
+                        kubectl delete svc $app
 
-                                        echo build docker
-                                        docker rm -f $app
-                                        ls -al
-                                        docker build -f Dockerfile -t $image . 
-                                    
-                                        echo push docker
-                                        docker push $image
+                        echo "deploy docker"
+                        kubectl create deployment $app --image=$image --port=$port
+                        sleep 10
+                        kubectl expose deployment $app --target-port=$port --type=NodePort
+                        sleep 5
+                        kubectl port-forward svc/nginx  $port:$port &
+                        sleep 5
 
-                                        echo clean local one
-                                        docker rmi $image"
+                        echo "verify application"
+                        if curl localhost:$port | grep 'Welcome HONGQI' ; then
+                            echo "verify successfully"
+                        else
+                            echo "ERROR: verify failure"
+                            exit 1;
+                        fi
 
-                            """
-                             sh """
-                            echo "check docker"
-                            ssh -t root@192.168.2.38 "
-                                kubectl get nodes
-
-                                echo clean old one
-                                kubectl delete svc $app
-                                kubectl delete deploy $app
-
-                                echo create dep 
-                                kubectl create deployment $app --image=$image --port=$port
-
-                                echo create svc
-                                kubectl expose deployment $app --target-port=$port --type=NodePort"
-
-                            """
-                            /*
-                            echo "set kube environment"
-                            #MASTER=root@192.168.2.38
-                            #scp root@192.168.2.38:~/.kube/config .
-                            #export KUBECONFIG=$(pwd)/config
-
-                            echo "deploy on kubernetes remotely"
-                            echo "create dep "
-                            kubectl create deployment $app --image=$image --port=$port
-                            
-                            echo "create svc"
-                            kubectl expose deployment $app --target-port=$port --type=NodePort
-
-                            echo "port forward "
-                            kubectl port-forward service/nginx 8888:$port --address='0.0.0.0' &
-
-                            echo "verify docker"
-                            curl 192.168.2.38:8888
-
-                            echo "wait a whole"
-                            sleep 10
-
-                            echo "verify docker"
-                            if curl localhost:$port | grep 'Welcome HONGQI' ; then
-                                echo "verify successfully"
-                            else
-                                echo "ERROR: verify failure"
-                                exit 1;
-                            fi
-
-                            */
+                        echo "clean env"
+                        pid=`ps -ax|grep port-forward | awk 'NR==1{print $1}'`
+                        kill -9 $pid
+                           
+                        """
                            }
 						}
 					}

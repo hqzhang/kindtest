@@ -16,13 +16,20 @@
  kubectl get pods
 
  kubectl delete deploy $app
- kubectl delete pod $app
  kubectl delete svc $app
 
  kubectl create deployment $app --image=$image --port=$port
-
+ sleep 10
  kubectl expose deployment $app --target-port=$port --type=NodePort
+ sleep 5
+ kubectl port-forward svc/nginx  $port:$port &
+ sleep 5
 
- kc port-forward svc/nginx  8888:$port &
-
- curl localhost:888
+ if curl localhost:$port | grep 'Welcome HONGQI' ; then
+    echo "verify successfully"
+ else
+    echo "ERROR: verify failure"
+    exit 1;
+ fi
+ pid=`ps -ax|grep port-forward | awk 'NR==1{print $1}'`
+ kill -9 $pid
