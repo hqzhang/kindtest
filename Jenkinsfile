@@ -49,14 +49,38 @@ pipeline {
                             echo "clean local one"
                             docker rmi $image
 
-                            echo "deploy docker remotely"
-                           
-                            docker run --name $app -d -p $port:$port $image
+                    """
+                    }
+                }
+            }
+        }
+                
+        stage('Stage: Deploy docker images'){
+            steps { 
+                script {
+                    echo "Stage: Deploy docker images..."
+                  
+                    //withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh """
+                        echo "deploy docker "
+                        docker run --name $app -d -p $port:$port $image
 
-                            echo "wait a whole"
-                            sleep 10
+                        echo "wait a whole"
+                        sleep 10
 
-                            echo "verify docker"
+                        """
+                    //}
+                }
+            }
+        }
+        stage('Stage: Verification'){
+            steps { 
+                script {
+                    echo "Stage: Verification..."
+                    
+                    //withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh """
+                          echo "verify docker"
                             if curl localhost:$port | grep 'Welcome HONGQI' ; then
                                 echo "verify successfully"
                             else
@@ -64,12 +88,12 @@ pipeline {
                                 exit 1;
                             fi
 
+                         """
+            //       }
+                }
+            }
+        }
 
-                            """
-                           }
-						}
-					}
-				}
 
 	}
 }
