@@ -38,8 +38,9 @@ pipeline {
                         docker rmi $image
 
                         echo "clean environment"
-                        kubectl delete deploy $app
                         kubectl delete svc $app
+                        kubectl delete deploy $app
+                       
 
                         echo "deploy docker"
                         kubectl create deployment $app --image=$image --port=$port
