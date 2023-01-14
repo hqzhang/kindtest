@@ -1,19 +1,35 @@
 . ~/.rc
-myapp=nginx-openshift
-myorg=wavecloud
-myimage=$myorg/$myapp
-myport=8081
+image=wavecloud/nginx-std
+ port=8081
+ app=nginx
+ docker build -f Dockerfile -t $image  .
 
-echo "build and push docker images"
-docker login -uzhanghongqi -p${dockerps}
-set -x
+echo "login docker"
+docker login -u$USERNAME -p$PASSWORD
 
-docker build -f Dockerfile -t wavecloud/nginx-openshift  . 
+echo "build docker"
+docker rm -f $app
+ls -al
+docker build -f Dockerfile -t $image . 
 
-# docker push $myimage
-# docker rmi $myimage
+echo "push docker"
+docker push $image
+docker rmi $image
 
-echo "stop and start docker"
-docker rm -f mynginx
-docker run --name mynginx -p 8081:8081 -d wavecloud/nginx-openshift
+echo "deploy docker "
+docker run --name $app -d -p $port:$port $image
+
+echo "wait a whole"
+sleep 10
+
+echo "verify docker"
+if curl localhost:$port | grep 'Welcome HONGQI' ; then
+    echo "verify successfully"
+else
+    echo "ERROR: verify failure"
+    exit 1;
+fi
+
+echo "clean docker "
+docker rm -f $app
 

@@ -32,21 +32,15 @@ pipeline {
                     echo "Input Parameters: ${params}"
                     withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh """
-                            echo "check docker"
-                            docker ps
-
                             echo "login docker"
                             docker login -u$USERNAME -p$PASSWORD
 
                             echo "build docker"
-                            docker rm -f $app
-                            ls -al
+                            docker rm -f $app | echo "container not running"
                             docker build -f Dockerfile -t $image . 
                          
-                            echo "push docker"
+                            echo "push docker and clean"
                             docker push $image
-
-                            echo "clean local one"
                             docker rmi $image
 
                     """
