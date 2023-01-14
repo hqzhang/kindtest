@@ -2,9 +2,9 @@
 properties([
    pipelineTriggers([githubPush()]),
    parameters([
-              string(name: 'Org', default: 'wavecloud', description: 'input organization'),
-              string(name: 'App', default: 'nginx-openshift', description: 'input application'), 
-              string(name: 'Port', default: '8081', description: 'input expose port'),
+              string(name: 'Org', defaultValue: 'wavecloud', description: 'input organization'),
+              string(name: 'App', defaultValue: 'nginx-openshift', description: 'input application'), 
+              string(name: 'Port', defaultValue: '8081', description: 'input expose port'),
 		])
 ])
 pipeline {
