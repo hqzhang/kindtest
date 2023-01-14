@@ -24,7 +24,7 @@ pipeline {
     }
 
     stages {
-        stage('Stage: Run Ansible Playbook'){
+        stage('Stage: Build and push docker images'){
             steps { 
                 script {
                     echo "Stage: Initial and Clean..."
@@ -43,13 +43,42 @@ pipeline {
                         export KUBECONFIG=./config
                         kubectl delete svc $app
                         kubectl delete deploy $app
+                  
+                        """
+                    }
+				}
+			}
+		}
+        stage('Stage: Deploy on kubernetes'){
+            steps { 
+                script {
+                    echo "Stage: Deploy on kubernetes.."
+                    withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                     sh """
+                      echo "clean environment"
+                        cat config
+                        export KUBECONFIG=./config
+                        kubectl delete svc $app
+                        kubectl delete deploy $app
                        
-
                         echo "deploy docker"
                         kubectl create deployment $app --image=$image --port=$port
                         sleep 10
                         kubectl expose deployment $app --target-port=$port --type=NodePort
                         sleep 5
+
+                       """
+                    }
+                }
+            }
+        }
+        stage('Stage: Verification '){
+            steps { 
+                script {
+                    echo "Stage: Verification..."
+                   
+                    //withCredentials([usernamePassword(credentialsId: dockerCred, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                     sh """
                         kubectl port-forward svc/nginx  $port:$port &
                         sleep 5
 
@@ -63,13 +92,13 @@ pipeline {
 
                         echo "clean env"
                         kill -9 `ps -ax|grep port-forward | awk 'NR==1{print \$1}'`
-                        
-                           
-                        """
-                           }
-						}
-					}
-				}
+
+                       """
+                    //}       
+                }
+            }
+        }
+                ////////
 
 	}
 }
