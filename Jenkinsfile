@@ -25,7 +25,7 @@ pipeline {
     }
 
     stages {
-        stage('Stage: Run Ansible Playbook'){
+        stage('Stage: Build and push image'){
             steps { 
                 script {
                     echo "Stage: Initial and Clean..."
@@ -87,6 +87,9 @@ pipeline {
                                 echo "ERROR: verify failure"
                                 exit 1;
                             fi
+
+                            echo "clean docker "
+                            docker rm -f $app
 
                          """
             //       }
