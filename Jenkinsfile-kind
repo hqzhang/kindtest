@@ -42,11 +42,8 @@ pipeline {
                         pwd
                         export KUBECONFIG=./config
                         ls -al config
-                        #kubectl delete svc $app
-                        #kubectl delete deploy $app
-                        kubectl get nodes
-                        kubectl get deploy
-                        kubectl get svc
+                        kubectl delete svc $app
+                        kubectl delete deploy $app
                        
 
                         echo "deploy docker"
