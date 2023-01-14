@@ -21,7 +21,7 @@ pipeline {
        image='wavecloud/nginx-std'
        port='8081'
        app='nginx'
-       KUBECONFIG=./config
+       KUBECONFIG='./config'
     }
 
     stages {
