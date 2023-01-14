@@ -40,7 +40,8 @@ pipeline {
 
                         echo "clean environment"
                         pwd
-                        ls -al ~/.kube/config
+                        export KUBECONFIG=./config
+                        ls -al config
                         #kubectl delete svc $app
                         #kubectl delete deploy $app
                         kubectl get nodes
