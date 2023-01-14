@@ -58,8 +58,8 @@ pipeline {
                         fi
 
                         echo "clean env"
-                        mypid=`ps -ax|grep port-forward | awk 'NR==1{print \$1}'`
-                        kill -9 $mypid
+                        kill -9 `ps -ax|grep port-forward | awk 'NR==1{print \$1}'`
+                        
                            
                         """
                            }
