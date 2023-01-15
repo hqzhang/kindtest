@@ -1,4 +1,17 @@
-# kindtest
+
+# How to use the repo
+```
+1. git clone https://github.com/hqzhang/kindtest.git
+   cd kindtest
+2. docker play: ./rundocker
+   docker advance: ./rundoker_adv
+3. kubernetes play: ./runkube
+4. Jenkins play docker: 
+   create Jenkins pipeline job and input https://github.com/hqzhang/kindtest.git and Jenkinsfile
+5. Jenkins play kubernetes:
+    create Jenkins pipeline job and input https://github.com/hqzhang/kindtest.git and Jenkinsfile-kind
+```
+
 # Devops Summary
 0. [Github etc](#github-etc)
 1. [VirtualBox etc](#virtualbox-etc)
