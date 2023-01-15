@@ -8,7 +8,7 @@
  set +x
  docker login -uzhanghongqi -p${dockerps}
  set -x
- docker build -f Dockerfile -t $image  . --build-arg port=$port # override argument
+ docker build -f Dockerfile_adv -t $image  . --build-arg port=$port # override argument
  docker push $image
 
  docker rm -f $app
