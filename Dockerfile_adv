@@ -1,0 +1,31 @@
+# build stage
+FROM golang:1.12.5-alpine3.9 as build-stage
+WORKDIR /app
+
+COPY main.go ./
+RUN go build main.go
+
+# runtime stage
+FROM alpine:3.9
+LABEL authors="Hongqi Zhang <zhanghongqi@hotmail.com>"
+
+ARG user=myuser
+ARG group=mygroup
+ARG port=8080
+ENV port $port
+RUN addgroup  ${group} \
+  && adduser -G ${group} -s /bin/bash -D ${user}
+
+RUN apk update && apk add --no-cache --virtual tzdata \
+  && cp /usr/share/zoneinfo/America/New_York /etc/localtime \
+  && echo "America/New_York" > /etc/timezone   \
+  && apk del tzdata && rm -rf /var/cache/apk/* 
+
+COPY --from=build-stage /app/main /
+
+EXPOSE ${port}
+
+USER ${user}
+
+CMD /main $port
+#CMD while true;do echo "wait 2..";sleep 2; done
