@@ -8,16 +8,18 @@
  set +x
  docker login -uzhanghongqi -p${dockerps}
  set -x
+ echo "build and push image"
  docker build -f Dockerfile_adv -t $image  . --build-arg port=$port # override argument
  docker push $image
 
+ echo "run an image"
  docker rm -f $app
  docker image rm $image
  docker run --name $app -p $port:$port -d \
                         -e PORT=$port -v `pwd`:/tmp  \
                         $image  # override PORT
 
- echo "wait a whole"
+ echo "wait a while"
  sleep 10
 
  echo "verify docker"

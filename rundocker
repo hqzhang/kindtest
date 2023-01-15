@@ -1,26 +1,23 @@
-. ~/.rc
+source ~/.rc
 image=wavecloud/nginx-std
  port=8081
  app=nginx
  docker build -f Dockerfile -t $image  .
 
 echo "login docker"
-docker login -u$USERNAME -p$PASSWORD
+docker login -uzhanghongqi -p$dockerpass
 
-echo "build docker"
+echo "build and push image"
 docker rm -f $app
-ls -al
 docker build -f Dockerfile -t $image . 
-
-echo "push docker"
 docker push $image
 docker rmi $image
 
-echo "deploy docker "
+echo "run docker container "
 docker run --name $app -d -p $port:$port $image
 
-echo "wait a whole"
-sleep 10
+echo "wait a while"
+sleep 5
 
 echo "verify docker"
 if curl localhost:$port | grep 'Welcome HONGQI' ; then
